@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
@@ -40,6 +41,7 @@ import collegeapplication.admin.AdminMain;
  * Created by : Ajaysinh Rathod
  * Purpose : For adding new faculty 
  * Mail : ajaysinhrathod1290@gmail.com
+ * co-author : anirudhkosgi(kosgi34@gmail.com)
  */
 
 @SuppressWarnings("serial")
@@ -309,16 +311,25 @@ public class AddFaculityDialog extends JDialog implements ActionListener
 		getContentPane().add(experiencefield);
 		
 		JLabel doblabel = new JLabel("Date of Birth");
+		doblabel.setForeground(Color.WHITE);
 		doblabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		doblabel.setBounds(21, 414, 134, 29);
 		getContentPane().add(doblabel);
 		
 		birthdatespinner = new JSpinner();
+		birthdatespinner.setToolTipText("Date Of Birth");
+		birthdatespinner.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					birthdatespinner.setFocusable(false);
+				}
+			}
+		});
 		birthdatespinner.setFont(new Font("Segoe UI", Font.PLAIN, 17));
+		SimpleDateFormat model = new SimpleDateFormat("dd-MM-yyyy");
 		birthdatespinner.setModel(new SpinnerDateModel());
-		SimpleDateFormat model=new SimpleDateFormat("dd-MM-yyyy");
-		birthdatespinner.setEditor(new JSpinner.DateEditor(birthdatespinner,model.toPattern()));
-		birthdatespinner.setForeground(Color.WHITE);
+		birthdatespinner.setEditor(new JSpinner.DateEditor(birthdatespinner, model.toPattern()));
 		birthdatespinner.setBounds(21, 442, 322, 42);
 		getContentPane().add(birthdatespinner);
 		
@@ -489,12 +500,21 @@ public class AddFaculityDialog extends JDialog implements ActionListener
 			else if(emailidfield.getText().isEmpty())
 			{
 				showerror(emailidfield);
+			} 
+			else if(!isValidEmail(emailidfield.getText())) 
+			{
+            	Errorlabel.setText("Invalid email format!");
+            	showerror(emailidfield);
 			}
 			else if(contactnumberfield.getText().isEmpty())
 			{
 				showerror(contactnumberfield);
 			}
-
+			else if(!isValidPhoneNumber(contactnumberfield.getText())) 
+			{
+            	Errorlabel.setText("Invalid phone number format!");
+            	showerror(contactnumberfield);
+			}
 			else if(qualificationfield.getText().isEmpty())
 			{
 				showerror(qualificationfield);
@@ -586,6 +606,18 @@ public class AddFaculityDialog extends JDialog implements ActionListener
 			}
 		}
 	}
+
+	private boolean isValidEmail(String email) {
+    String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+    Pattern pattern = Pattern.compile(emailRegex);
+    return pattern.matcher(email).matches();
+}
+
+private boolean isValidPhoneNumber(String phoneNumber) {
+    String phoneRegex = "^[0-9]{10}$";
+    Pattern pattern = Pattern.compile(phoneRegex);
+    return pattern.matcher(phoneNumber).matches();
+}
 
 	public void showerror(JComponent tf)
 	{
